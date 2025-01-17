@@ -1,0 +1,29 @@
+# ignore verilator outputs
+**/obj_dir/**
+
+# ignore intermediate binary files for sim test bootrom
+sim/test_rom/*.bin
+sim/test_rom/*.elf
+sim/test_rom/*.o
+
+# ignore sim dumps
+sim/dump.*
+
+# ignore macos bullshits
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk

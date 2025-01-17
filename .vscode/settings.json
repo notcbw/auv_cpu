@@ -1,0 +1,6 @@
+{
+    "verilog.linting.verilator.includePath": [
+        "${workspaceFolder}/rtl"
+    ],
+    "verilog.linting.verilator.arguments": "--timing"
+}

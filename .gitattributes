@@ -1,0 +1,2 @@
+* text=auto eol=lf
+sim/test_rom/test.mem text eol=crlf
