@@ -50,7 +50,7 @@ module auv_csr (
                     else
                         state <= 0;
                 end
-                3 : state <= 0; // err state
+                default : state <= 0;
             endcase
         end
 
@@ -77,7 +77,7 @@ module auv_csr (
                 reg_wr = 0;
                 exc_illegal_inst = 0;
             end
-            3 : begin
+            default : begin
                 stall = 0;
                 cbus_rd = 0;
                 cbus_wr = 0;
