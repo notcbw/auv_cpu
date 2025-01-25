@@ -142,8 +142,15 @@ module auv_execute #(
     // wb signal
     logic [31:0] mem_dat;
     logic mem_reg_wr; // set when data is loaded from memory
-    assign reg_wr_dat = link ? (pc + 4) : alu_out;
+
     assign reg_wr_o = ~stall_i & (mem_reg_wr | reg_wr_i);
+    always_comb
+        if (mem_reg_wr)
+            reg_wr_dat = mem_dat;
+        else if (link)
+            reg_wr_dat = pc + 4;
+        else
+            reg_wr_dat = alu_out;
 
     // bus
     // detect load/store fault
