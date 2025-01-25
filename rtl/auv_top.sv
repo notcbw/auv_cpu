@@ -6,24 +6,29 @@ import auv_pkg::*;
 
 module auv_top #(
     parameter integer ADDR_WIDTH = 24,
-    parameter integer BOOTROM_WIDTH = 10,
+    parameter string ROM_FNAME = "bootrom.mem",
+    parameter integer ROM_SIZE = 8192,
     parameter bit [ADDR_WIDTH-1:0] RST_VECTOR = 'h0,
     parameter bit [ADDR_WIDTH-1:0] NMI_VECTOR = 'h0,
-    parameter integer INT_COUNT = 16
+    parameter integer INT_COUNT = 16,
+    localparam integer RomSizeWords = ROM_SIZE / 4,
+    localparam integer RomWidth = $clog2(RomSizeWords)
 ) (
-    input   logic           clk, rst_n,
-    input   logic           nmi, int_timer,
-    input   logic   [INT_COUNT-1:0] irq_input,
-    // bootrom
-    output  logic   [BOOTROM_WIDTH-1:0] rom_adr,
-    input   logic   [31:0]  rom_dat,
+    input   logic                       clk, rst_n,
+    input   logic                       nmi, int_timer,
+    input   logic   [INT_COUNT-1:0]     irq_input,
     // wishbone master
-    output  logic   [ADDR_WIDTH-1:0] wb_adr_o,
-    input   logic   [15:0]  wb_dat_i,
-    output  logic   [15:0]  wb_dat_o,
-    output  logic   [ 1:0]  wb_sel_o,
-    output  logic           wb_we_o, wb_stb_o, wb_cyc_o,
-    input   logic           wb_ack_i, wb_stall_i, wb_err_i
+    output  logic   [ADDR_WIDTH-1:0]    wb_adr_o,
+    input   logic   [15:0]              wb_dat_i,
+    output  logic   [15:0]              wb_dat_o,
+    output  logic   [ 1:0]              wb_sel_o,
+    output  logic                       wb_we_o, wb_stb_o, wb_cyc_o,
+    input   logic                       wb_ack_i, wb_stall_i, wb_err_i,
+    // bootrom wishbone slave
+    input   logic   [RomWidth+1:0]      rom_wb_adr_i,
+    output  logic   [15:0]              rom_wb_dat_o,
+    input   logic                       rom_wb_stb_i, rom_wb_cyc_i,
+    output  logic                       rom_wb_ack_o
 );
 
     logic exc_illegal_inst, exc_illegal_inst_csr, exc_ecall, exc_ebreak;
@@ -75,16 +80,22 @@ module auv_top #(
 
     auv_fetch #(
         .ADDR_WIDTH         ( ADDR_WIDTH        ),
-        .BOOTROM_WIDTH      ( BOOTROM_WIDTH     )
+        .ROM_FNAME          ( ROM_FNAME         ),
+        .ROM_SIZE           ( ROM_SIZE          )
     ) stage_if (
         .clk                ( clk               ),
+        .rst_n              ( rst_n             ),
         .pop                ( id_pop            ),
         .jmp                ( jmp               ),
         .pc_wr              ( pc_wr             ),
         .inst               ( if_inst           ),
         .pc_out             ( id_pc             ),
-        .rom_adr            ( rom_adr           ),
-        .rom_dat            ( rom_dat           )
+        .instret            (                   ),
+        .wb_adr_i           ( rom_wb_adr_i      ),
+        .wb_dat_o           ( rom_wb_dat_o      ),
+        .wb_stb_i           ( rom_wb_stb_i      ),
+        .wb_cyc_i           ( rom_wb_cyc_i      ),
+        .wb_ack_o           ( rom_wb_ack_o      )
     );
 
     auv_decode #(

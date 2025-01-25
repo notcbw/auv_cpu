@@ -1,5 +1,3 @@
-#include "auv.h"
-
 .section .text
 .balign 4
 .global _start
@@ -13,7 +11,7 @@ _start:
 	addi sp, s0, 256
 	
 main:
-	mv t0, zero
+	lw t0, val_base
 mloop:
 	sw t0, 0(s0)
 	addi t0, t0, 1
@@ -26,6 +24,12 @@ _trap_service:
 	sw a0, 4(t0)
 	wfi
 	nop
+
+.section .rodata
+.balign 4
+
+val_base:
+	.long 0x45451919
 	
 	
 .section .trap_vector, "ax"

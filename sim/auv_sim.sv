@@ -53,21 +53,6 @@ module auv_sim;
             grant_ram_2 <= grant_ram;
         end
 
-    auv_bootrom #(
-        .ROM_FNAME(RomFName),
-        .ROM_SIZE(RomSize)
-    ) rom (
-        .clk(clk),
-        .rst_n(rst_n),
-        .rom_adr(rom_adr),
-        .rom_dat(rom_dat),
-        .wb_adr_i(wb_adr[RomWidth+1:0]),
-        .wb_dat_o(wb_dat_rom),
-        .wb_stb_i(wb_stb),
-        .wb_cyc_i(wb_cyc_rom),
-        .wb_ack_o(wb_ack_rom)
-    );
-
     sim_ram #(
         .SIZE(RamSize)
     ) ram (
@@ -85,7 +70,8 @@ module auv_sim;
 
     auv_top #(
         .ADDR_WIDTH(AddrWidth),
-        .BOOTROM_WIDTH(RomWidth),
+        .ROM_FNAME(RomFName),
+        .ROM_SIZE(RomSize),
         .RST_VECTOR(0),
         .NMI_VECTOR(0),
         .INT_COUNT(4)
@@ -95,8 +81,6 @@ module auv_sim;
         .nmi(0),
         .int_timer(int_timer),
         .irq_input(0),
-        .rom_adr(rom_adr),
-        .rom_dat(rom_dat),
         .wb_adr_o(wb_adr),
         .wb_dat_i(wb_dat_rd),
         .wb_dat_o(wb_dat_wr),
@@ -106,7 +90,12 @@ module auv_sim;
         .wb_cyc_o(wb_cyc),
         .wb_ack_i(wb_ack),
         .wb_stall_i(0),
-        .wb_err_i(wb_err)
+        .wb_err_i(wb_err),
+        .rom_wb_adr_i(wb_adr[9:0]),
+        .rom_wb_dat_o(wb_dat_rom),
+        .rom_wb_stb_i(wb_stb),
+        .rom_wb_cyc_i(wb_cyc_rom),
+        .rom_wb_ack_o(wb_ack_rom)
     );
 
     initial begin
